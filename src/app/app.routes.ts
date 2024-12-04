@@ -6,10 +6,10 @@ export const routes: Routes = [
     {
         path: '',
         pathMatch: 'full',
-        redirectTo: 'main'
+        redirectTo: 'starships'
     },
     {
-        path: 'main',
+        path: 'starships',
         component: StarshipsListComponent
     },
     {
