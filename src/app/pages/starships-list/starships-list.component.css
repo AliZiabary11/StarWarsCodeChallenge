@@ -1,0 +1,38 @@
+.header {
+    text-align: center;
+    font-size: 2rem;
+    margin-bottom: 20px;
+    color: #fff;
+  }
+  
+  .filters {
+    display: flex;
+    gap: 16px;
+    margin-bottom: 20px;
+  }
+  
+  .search-field {
+    flex: 2;
+  }
+  
+  .filter-field {
+    flex: 1;
+  }
+  
+  .loading {
+    text-align: center;
+    font-size: 1.5rem;
+  }
+  
+  .mat-elevation-z8 {
+    margin: 20px 0;
+  }
+  
+  table {
+    width: 100%;
+  }
+
+  .container{
+    background-color: #3f3f70;
+  }
+  
