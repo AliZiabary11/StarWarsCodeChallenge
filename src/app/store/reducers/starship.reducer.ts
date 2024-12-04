@@ -6,6 +6,7 @@ import {
   loadStarshipDetails,
   loadStarshipDetailsSuccess,
   loadStarshipDetailsFailure,
+  clearSelectedStarship,
 } from '../actions/starship.actions';
 
 export interface StarshipState {
@@ -37,5 +38,6 @@ export const starshipReducer = createReducer(
     selectedStarship: details,
     loading: false,
   })),
-  on(loadStarshipDetailsFailure, (state, { error }) => ({ ...state, loading: false, error }))
+  on(loadStarshipDetailsFailure, (state, { error }) => ({ ...state, loading: false, error })),
+  on(clearSelectedStarship, (state) => ({ ...state, selectedStarship:null })),
 );

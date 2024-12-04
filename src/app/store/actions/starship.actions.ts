@@ -22,3 +22,9 @@ export const loadStarshipDetailsFailure = createAction(
   '[Starship] Load Starship Details Failure',
   props<{ error: any }>()
 );
+
+
+export const clearSelectedStarship = createAction(
+    '[Starship] Clear Selected Starship',
+  );
+  

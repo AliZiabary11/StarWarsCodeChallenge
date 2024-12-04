@@ -4,7 +4,15 @@
     margin-bottom: 20px;
     color: #fff;
   }
+
   
+.loading-indicator {
+  margin-top: 50px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
   .filters {
     display: flex;
     gap: 16px;
@@ -31,8 +39,3 @@
   table {
     width: 100%;
   }
-
-  .container{
-    background-color: #3f3f70;
-  }
-  
