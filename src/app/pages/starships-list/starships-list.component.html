@@ -1,1 +1,21 @@
-<p>starships-list works!</p>
+<h1>Starships</h1>
+
+@if(loading$ | async) {
+<div>Loading...</div>
+}
+@for (starship of starships$ | async; track starship.url) {
+<ul>
+    <li (click)="fetchStarshipDetails(starship.url)">
+        {{ starship.name }}
+    </li>
+</ul>
+} @empty {
+<p>No Starships</p>
+}
+
+
+@if(selectedStarship$ | async; as starship) {
+<h2>
+    Details for: {{ starship.name }}
+</h2>
+}
