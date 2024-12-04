@@ -1,16 +1,17 @@
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnDestroy, OnInit } from '@angular/core';
-import { selectAllStarships, selectLoading, selectSelectedStarship } from '../../store/selectors/starship.selectors';
+import { AfterViewInit, ChangeDetectionStrategy, ChangeDetectorRef, Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { selectAllStarships, selectLoading, selectSelectedStarship, selectTotalCount } from '../../store/selectors/starship.selectors';
 import { Store } from '@ngrx/store';
 import { AppState } from '../../store/state/app.state';
-import { clearSelectedStarship, searchStarships} from '../../store/actions/starship.actions';
+import { clearSelectedStarship, loadPaginatedStarships } from '../../store/actions/starship.actions';
 import { AsyncPipe } from '@angular/common';
 import { Subscription, take } from 'rxjs';
-import { MatTableModule } from '@angular/material/table';
+import { MatTableDataSource, MatTableModule } from '@angular/material/table';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
 import { MatButtonModule } from '@angular/material/button';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { MatPaginator, MatPaginatorModule } from '@angular/material/paginator';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 const Modules: any[] = [MatTableModule,
@@ -19,6 +20,7 @@ const Modules: any[] = [MatTableModule,
   MatSelectModule,
   MatButtonModule,
   MatProgressSpinnerModule,
+  MatPaginatorModule,
   FormsModule];
 @Component({
   selector: 'app-starships-list',
@@ -28,62 +30,74 @@ const Modules: any[] = [MatTableModule,
   styleUrl: './starships-list.component.css',
   changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class StarshipsListComponent implements OnInit, OnDestroy {
+export class StarshipsListComponent implements OnDestroy, AfterViewInit {
+  @ViewChild(MatPaginator) paginator!: MatPaginator;
+
+
   starships$ = this.store.select(selectAllStarships);
   selectedStarship$ = this.store.select(selectSelectedStarship);
   loading$ = this.store.select(selectLoading);
+  totalCount$ = this.store.select(selectTotalCount);
 
-  displayedColumns: string[] = ['name', 'manufacturer','starship_class','details'];
-  filteredStarships: any[] = [];
+  pageSize = 10;
+  displayedColumns: string[] = ['name', 'manufacturer', 'starship_class', 'details'];
   manufacturers: string[] = [];
   searchText = '';
   selectedManufacturer = '';
+  dataSource = new MatTableDataSource<any>([]);
+
+
   subscription: Subscription = new Subscription();
 
-  constructor(private store: Store<AppState>, private router: Router, private cdr: ChangeDetectorRef) { }
+  constructor(private store: Store<AppState>, private router: Router) { }
+  ngAfterViewInit(): void {
+    this.loadPage(1);
 
-  public ngOnInit() {
-    this.performSearch('');
-    this.fillManufacturersData();
+    this.subscription.add(
+      this.starships$.subscribe((starships) => {
+        if (starships) {
+          this.dataSource.data = starships;
+        }
+      })
+    );
+
+    this.loadManufacturerData();
+  }
+
+
+  protected onPageChange(event: any) {
+    const page = event.pageIndex + 1;
+    this.loadPage(page);
+  }
+
+  private loadManufacturerData() {
+    this.subscription.add(
+      this.starships$.pipe(take(1)).subscribe((starships) => {
+        if (starships) {
+          const newManufacturers = Array.from(
+            new Set(starships.map((s) => s.manufacturer).filter((m) => !!m))
+          );
+          this.manufacturers = Array.from(new Set([...this.manufacturers, ...newManufacturers]));
+        }
+      })
+    );
   }
 
   public ngOnDestroy(): void {
     this.subscription.unsubscribe();
   }
 
-
-  performSearch(searchTerm: string) {
-    this.store.dispatch(searchStarships({ search: searchTerm }));
-  }
-
-  private fillManufacturersData() {
-    this.subscription.add(
-      this.starships$.subscribe((starships) => {
-        if (this.manufacturers.length === 0 && starships?.length) {
-          this.manufacturers = Array.from(
-            new Set(starships.map((s) => s.manufacturer).filter((m) => !!m))
-          );
-        }
-        this.filteredStarships = starships || [];
-        this.cdr.detectChanges();
-      })
-    );
-  }
-
-  protected applyFilters(starships: any[]) {
-    this.filteredStarships = starships.filter((starship) => {
-      const matchesManufacturer =
-        !this.selectedManufacturer || starship.manufacturer === this.selectedManufacturer;
-      return matchesManufacturer;
-    });
+  protected loadPage(page: number) {
+    this.store.dispatch(loadPaginatedStarships({ page, search: this.searchText }));
   }
 
   protected onManufacturerChange() {
-    this.starships$.subscribe((starships) => {
-      if (starships) {
-        this.applyFilters(starships);
-      }
-    });
+    alert('The Starwars API does not Support The Filtering by Manufacturer yet');
+  }
+
+  protected onSearchChange() {
+    this.paginator.pageIndex = 0;
+    this.loadPage(1);
   }
 
   protected viewDetails(url: string) {

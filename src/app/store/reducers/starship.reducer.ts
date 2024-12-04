@@ -4,13 +4,14 @@ import {
   loadStarshipDetailsSuccess,
   loadStarshipDetailsFailure,
   clearSelectedStarship,
-  searchStarshipsSuccess,
-  searchStarshipsFailure,
-  searchStarships,
+  loadPaginatedStarshipsFailure,
+  loadPaginatedStarshipsSuccess,
+  loadPaginatedStarships,
 } from '../actions/starship.actions';
 
 export interface StarshipState {
   starships: any[];
+  total: number;
   selectedStarship: any | null;
   loading: boolean;
   error: any | null;
@@ -18,6 +19,7 @@ export interface StarshipState {
 
 export const initialState: StarshipState = {
   starships: [],
+  total: 0,
   selectedStarship: null,
   loading: false,
   error: null,
@@ -25,13 +27,14 @@ export const initialState: StarshipState = {
 
 export const starshipReducer = createReducer(
   initialState,
-  on(searchStarships, (state) => ({ ...state, loading: true, error: null })),
-  on(searchStarshipsSuccess, (state, { starships }) => ({
+  on(loadPaginatedStarships, (state) => ({ ...state, loading: true })),
+  on(loadPaginatedStarshipsSuccess, (state, { starships, total }) => ({
     ...state,
     starships,
+    total,
     loading: false,
   })),
-  on(searchStarshipsFailure, (state, { error }) => ({
+  on(loadPaginatedStarshipsFailure, (state, { error }) => ({
     ...state,
     error,
     loading: false,

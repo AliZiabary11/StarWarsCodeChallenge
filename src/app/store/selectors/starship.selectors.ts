@@ -18,6 +18,11 @@ export const selectLoading = createSelector(
   (state) => state.loading
 );
 
+export const selectTotalCount = createSelector(
+  selectStarshipState,
+  (state) => state.total
+);
+
 export const selectError = createSelector(
   selectStarshipState,
   (state) => state.error

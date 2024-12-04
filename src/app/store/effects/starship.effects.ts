@@ -6,9 +6,9 @@ import {
   loadStarshipDetails,
   loadStarshipDetailsSuccess,
   loadStarshipDetailsFailure,
-  searchStarships,
-  searchStarshipsSuccess,
-  searchStarshipsFailure,
+  loadPaginatedStarshipsSuccess,
+  loadPaginatedStarshipsFailure,
+  loadPaginatedStarships,
 } from '../actions/starship.actions';
 
 @Injectable()
@@ -16,6 +16,29 @@ export class StarshipEffects {
   private apiUrl = 'https://swapi.dev/api/starships';
 
   constructor(private actions$: Actions, private http: HttpClient) {}
+
+  loadPaginatedStarships$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(loadPaginatedStarships),
+      mergeMap(({ page, search }) => {
+        // Build the query parameters
+        let url = `${this.apiUrl}/?page=${page}`;
+        if (search) {
+          url += `&search=${search}`;
+        }
+    
+        return this.http.get<any>(url).pipe(
+          map((response) =>
+            loadPaginatedStarshipsSuccess({
+              starships: response.results,
+              total: response.count,
+            })
+          ),
+          catchError((error) => of(loadPaginatedStarshipsFailure({ error })))
+        );
+      })
+    )
+  );
 
   loadStarshipDetails$ = createEffect(() =>
     this.actions$.pipe(
@@ -29,17 +52,4 @@ export class StarshipEffects {
     )
   );
 
-  searchStarships$ = createEffect(() =>
-    this.actions$.pipe(
-      ofType(searchStarships),
-      debounceTime(300), // Add debounce to avoid unnecessary rapid API calls
-      mergeMap(({ search }) =>
-        this.http.get<any>(`${this.apiUrl}/?search=${search}`).pipe(
-          map((response) => searchStarshipsSuccess({ starships: response.results })),
-          catchError((error) => of(searchStarshipsFailure({ error })))
-        )
-      )
-    )
-  );
-  
 }
