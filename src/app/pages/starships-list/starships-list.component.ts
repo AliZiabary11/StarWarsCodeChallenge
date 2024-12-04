@@ -69,7 +69,8 @@ export class StarshipsListComponent implements OnInit, OnDestroy {
       })
     );
   }
-  applyFilters(starships: any[]) {
+
+  protected applyFilters(starships: any[]) {
     this.filteredStarships = starships.filter((starship) => {
       const matchesManufacturer =
         !this.selectedManufacturer || starship.manufacturer === this.selectedManufacturer;
@@ -77,7 +78,7 @@ export class StarshipsListComponent implements OnInit, OnDestroy {
     });
   }
 
-  onManufacturerChange() {
+  protected onManufacturerChange() {
     this.starships$.subscribe((starships) => {
       if (starships) {
         this.applyFilters(starships);

@@ -24,14 +24,14 @@ export class StarshipsDetailComponent implements OnInit{
   constructor(private route: ActivatedRoute, private store: Store<AppState>,
     private router: Router,) {}
 
-  ngOnInit() {
+  public ngOnInit() {
     const id = this.route.snapshot.paramMap.get('id');
     if (id) {
       this.store.dispatch(loadStarshipDetails({ id }));
     }
   }
 
-  goBack() {
+  protected goBack() {
     this.router.navigate(['/']);
   }
 }
