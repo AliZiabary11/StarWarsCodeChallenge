@@ -6,41 +6,50 @@ import {
   loadStarshipDetails,
   loadStarshipDetailsSuccess,
   loadStarshipDetailsFailure,
-  loadPaginatedStarshipsSuccess,
-  loadPaginatedStarshipsFailure,
-  loadPaginatedStarships,
+  loadStarships,
+  updateManufacturers,
+  loadStarshipsSuccess,
+  loadStarshipsFailure,
+  filterStarships,
 } from '../actions/starship.actions';
+import { Store } from '@ngrx/store';
+import { AppState } from '../state/app.state';
 
 @Injectable()
 export class StarshipEffects {
   private apiUrl = 'https://swapi.dev/api/starships';
 
-  constructor(private actions$: Actions, private http: HttpClient) {}
+  constructor(private actions$: Actions, private http: HttpClient,private store: Store<AppState>) {}
 
-  loadPaginatedStarships$ = createEffect(() =>
+  loadStarships$ = createEffect(() =>
     this.actions$.pipe(
-      ofType(loadPaginatedStarships),
-      mergeMap(({ page, search }) => {
-        // Build the query parameters
-        let url = `${this.apiUrl}/?page=${page}`;
-        if (search) {
-          url += `&search=${search}`;
-        }
-    
-        return this.http.get<any>(url).pipe(
-          map((response) =>
-            loadPaginatedStarshipsSuccess({
-              starships: response.results,
-              total: response.count,
-            })
-          ),
-          catchError((error) => of(loadPaginatedStarshipsFailure({ error })))
-        );
-      })
+      ofType(loadStarships),
+      mergeMap(() => this.loadAllStarships(this.apiUrl)),
+      map((allStarships: any) => {
+        const manufacturers: string[] = [
+          ...new Set<string>(allStarships.map((ship: any) => ship.manufacturer)),
+        ];
+        this.store.dispatch(updateManufacturers({ manufacturers }));
+        return loadStarshipsSuccess({ starships: allStarships });
+      }),
+      catchError((error) => of(loadStarshipsFailure({ error: error.message })))
     )
   );
 
-  loadStarshipDetails$ = createEffect(() =>
+  private loadAllStarships(url: string, starships: any[] = []): any {
+    return this.http.get<any>(url).pipe(
+      mergeMap((response: any) => {
+        debugger;
+        const nextStarships = [...starships, ...response.results];
+        if (response.next) {
+          return this.loadAllStarships(response.next, nextStarships);
+        }
+        return of(nextStarships);
+      })
+    );
+  }
+
+ loadStarshipDetails$ = createEffect(() =>
     this.actions$.pipe(
       ofType(loadStarshipDetails),
       mergeMap(({ id }) =>

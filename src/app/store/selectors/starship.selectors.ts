@@ -8,6 +8,16 @@ export const selectAllStarships = createSelector(
   (state) => state.starships
 );
 
+export const selectFilterdStarships = createSelector(
+  selectStarshipState,
+  (state) => state.filteredStarships
+);
+
+export const selectManufacturers = createSelector(
+  selectStarshipState,
+  (state) => state.manufacturers
+);
+
 export const selectSelectedStarship = createSelector(
   selectStarshipState,
   (state) => state.selectedStarship
@@ -18,10 +28,6 @@ export const selectLoading = createSelector(
   (state) => state.loading
 );
 
-export const selectTotalCount = createSelector(
-  selectStarshipState,
-  (state) => state.total
-);
 
 export const selectError = createSelector(
   selectStarshipState,

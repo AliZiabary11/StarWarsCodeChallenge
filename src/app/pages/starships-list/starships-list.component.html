@@ -10,8 +10,8 @@
         <mat-form-field appearance="fill" class="filter-field">
             <mat-label>Filter by Manufacturer</mat-label>
             <mat-select [(ngModel)]="selectedManufacturer" (selectionChange)="onManufacturerChange()">
-                <mat-option value="">All - API doesn't support filtering</mat-option>
-                @for (manufacturer of manufacturers; track manufacturer) {
+                <mat-option value="">All</mat-option>
+                @for (manufacturer of manufacturers$ | async; track manufacturer) {
                 <mat-option [value]="manufacturer">
                     {{ manufacturer }}
                 </mat-option>
@@ -56,8 +56,8 @@
     </table>
     }
 
-    <mat-paginator [length]="(totalCount$ | async)" [pageSize]="pageSize" [pageSizeOptions]="[10]"
+    <!-- <mat-paginator [length]="(totalCount$ | async)" [pageSize]="pageSize" [pageSizeOptions]="[10]"
         (page)="onPageChange($event)" showFirstLastButtons>
-    </mat-paginator>
+    </mat-paginator> -->
 
 </div>
