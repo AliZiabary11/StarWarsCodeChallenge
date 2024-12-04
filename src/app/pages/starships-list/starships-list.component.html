@@ -1,62 +1,59 @@
-<div class="w-100 h-100 container" >
+<div class="w-100 h-100 container">
     <h1 class="header">Starships</h1>
     <div class="filters">
         <mat-form-field appearance="fill" class="search-field">
             <mat-label>Search</mat-label>
-            <input matInput type="text" [(ngModel)]="searchText" (input)="filterStarships()"
+            <input matInput type="text" [(ngModel)]="searchText" (input)="performSearch(searchText)"
                 placeholder="Enter Search String" />
         </mat-form-field>
-    
+
         <mat-form-field appearance="fill" class="filter-field">
             <mat-label>Filter by Manufacturer</mat-label>
-            <mat-select [(ngModel)]="selectedManufacturer" (selectionChange)="filterStarships()">
+            <mat-select [(ngModel)]="selectedManufacturer" (selectionChange)="onManufacturerChange()">
                 <mat-option value="">All</mat-option>
                 @for (manufacturer of manufacturers; track manufacturer) {
                 <mat-option [value]="manufacturer">
                     {{ manufacturer }}
                 </mat-option>
                 }
-    
             </mat-select>
         </mat-form-field>
     </div>
-    
+
     @if(loading$ | async) {
-        <div class="loading-indicator">
-            <mat-progress-spinner mode="indeterminate" diameter="50" color="accent"></mat-progress-spinner>
-        </div>
+    <div class="loading-indicator">
+        <mat-progress-spinner mode="indeterminate" diameter="50" color="accent"></mat-progress-spinner>
+    </div>
     }@else {
-        <table mat-table [dataSource]="filteredStarships" class="mat-elevation-z8">
-            <ng-container matColumnDef="name">
-                <th mat-header-cell *matHeaderCellDef>Name</th>
-                <td mat-cell *matCellDef="let starship">{{ starship.name }}</td>
-            </ng-container>
-        
-            <ng-container matColumnDef="starship_class">
-                <th mat-header-cell *matHeaderCellDef>Starship Class</th>
-                <td mat-cell *matCellDef="let starship">{{ starship.starship_class }}</td>
-            </ng-container>
-        
-            <ng-container matColumnDef="manufacturer">
-                <th mat-header-cell *matHeaderCellDef>Manufacturer</th>
-                <td mat-cell *matCellDef="let starship">{{ starship.manufacturer }}</td>
-            </ng-container>
-        
-            <ng-container matColumnDef="details">
-                <th mat-header-cell *matHeaderCellDef>Details</th>
-                <td mat-cell *matCellDef="let starship">
-                    <button mat-raised-button color="primary" (click)="viewDetails(starship.url)">
-                        View Details
-                    </button>
-                </td>
-            </ng-container>
-        
-            <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-            <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
-        </table>
-        
+    <table mat-table [dataSource]="filteredStarships" class="mat-elevation-z8">
+        <ng-container matColumnDef="name">
+            <th mat-header-cell *matHeaderCellDef>Name</th>
+            <td mat-cell *matCellDef="let starship">{{ starship.name }}</td>
+        </ng-container>
+
+        <ng-container matColumnDef="starship_class">
+            <th mat-header-cell *matHeaderCellDef>Starship Class</th>
+            <td mat-cell *matCellDef="let starship">{{ starship.starship_class }}</td>
+        </ng-container>
+
+        <ng-container matColumnDef="manufacturer">
+            <th mat-header-cell *matHeaderCellDef>Manufacturer</th>
+            <td mat-cell *matCellDef="let starship">{{ starship.manufacturer }}</td>
+        </ng-container>
+
+        <ng-container matColumnDef="details">
+            <th mat-header-cell *matHeaderCellDef>Details</th>
+            <td mat-cell *matCellDef="let starship">
+                <button mat-raised-button color="primary" (click)="viewDetails(starship.url)">
+                    View Details
+                </button>
+            </td>
+        </ng-container>
+
+        <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+        <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
+    </table>
+
     }
-    
-  
-    
+
 </div>

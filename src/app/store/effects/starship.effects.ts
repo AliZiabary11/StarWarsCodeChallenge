@@ -1,14 +1,14 @@
 import { Injectable } from '@angular/core';
 import { Actions, createEffect, ofType } from '@ngrx/effects';
 import { HttpClient } from '@angular/common/http';
-import { catchError, map, mergeMap, of } from 'rxjs';
+import { catchError, debounceTime, map, mergeMap, of } from 'rxjs';
 import {
-  loadStarships,
-  loadStarshipsSuccess,
-  loadStarshipsFailure,
   loadStarshipDetails,
   loadStarshipDetailsSuccess,
   loadStarshipDetailsFailure,
+  searchStarships,
+  searchStarshipsSuccess,
+  searchStarshipsFailure,
 } from '../actions/starship.actions';
 
 @Injectable()
@@ -16,18 +16,6 @@ export class StarshipEffects {
   private apiUrl = 'https://swapi.dev/api/starships';
 
   constructor(private actions$: Actions, private http: HttpClient) {}
-
-  loadStarships$ = createEffect(() =>
-    this.actions$.pipe(
-      ofType(loadStarships),
-      mergeMap(() =>
-        this.http.get<any>(this.apiUrl).pipe(
-          map((response) => loadStarshipsSuccess({ starships: response.results })),
-          catchError((error) => of(loadStarshipsFailure({ error })))
-        )
-      )
-    )
-  );
 
   loadStarshipDetails$ = createEffect(() =>
     this.actions$.pipe(
@@ -40,4 +28,18 @@ export class StarshipEffects {
       )
     )
   );
+
+  searchStarships$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(searchStarships),
+      debounceTime(300), // Add debounce to avoid unnecessary rapid API calls
+      mergeMap(({ search }) =>
+        this.http.get<any>(`${this.apiUrl}/?search=${search}`).pipe(
+          map((response) => searchStarshipsSuccess({ starships: response.results })),
+          catchError((error) => of(searchStarshipsFailure({ error })))
+        )
+      )
+    )
+  );
+  
 }

@@ -1,8 +1,8 @@
-import { ChangeDetectionStrategy, Component, OnDestroy, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnDestroy, OnInit } from '@angular/core';
 import { selectAllStarships, selectLoading, selectSelectedStarship } from '../../store/selectors/starship.selectors';
 import { Store } from '@ngrx/store';
 import { AppState } from '../../store/state/app.state';
-import { loadStarships, clearSelectedStarship} from '../../store/actions/starship.actions';
+import { clearSelectedStarship, searchStarships} from '../../store/actions/starship.actions';
 import { AsyncPipe } from '@angular/common';
 import { Subscription, take } from 'rxjs';
 import { MatTableModule } from '@angular/material/table';
@@ -40,15 +40,20 @@ export class StarshipsListComponent implements OnInit, OnDestroy {
   selectedManufacturer = '';
   subscription: Subscription = new Subscription();
 
-  constructor(private store: Store<AppState>, private router: Router) { }
+  constructor(private store: Store<AppState>, private router: Router, private cdr: ChangeDetectorRef) { }
 
   public ngOnInit() {
-    this.store.dispatch(loadStarships());
+    this.performSearch('');
     this.fillManufacturersData();
   }
 
   public ngOnDestroy(): void {
     this.subscription.unsubscribe();
+  }
+
+
+  performSearch(searchTerm: string) {
+    this.store.dispatch(searchStarships({ search: searchTerm }));
   }
 
   private fillManufacturersData() {
@@ -60,23 +65,25 @@ export class StarshipsListComponent implements OnInit, OnDestroy {
           );
         }
         this.filteredStarships = starships || [];
+        this.cdr.detectChanges();
       })
     );
   }
-
-  protected filterStarships() {
-    this.starships$.subscribe((starships) => {
-      this.filteredStarships = starships.filter((starship) => {
-        const matchesSearch = starship.name
-          .toLowerCase()
-          .includes(this.searchText.toLowerCase());
-        const matchesManufacturer =
-          !this.selectedManufacturer || starship.manufacturer === this.selectedManufacturer;
-        return matchesSearch && matchesManufacturer;
-      });
+  applyFilters(starships: any[]) {
+    this.filteredStarships = starships.filter((starship) => {
+      const matchesManufacturer =
+        !this.selectedManufacturer || starship.manufacturer === this.selectedManufacturer;
+      return matchesManufacturer;
     });
   }
 
+  onManufacturerChange() {
+    this.starships$.subscribe((starships) => {
+      if (starships) {
+        this.applyFilters(starships);
+      }
+    });
+  }
 
   protected viewDetails(url: string) {
     this.store.dispatch(clearSelectedStarship());

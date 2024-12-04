@@ -1,14 +1,5 @@
 import { createAction, props } from '@ngrx/store';
 
-export const loadStarships = createAction('[Starship] Load Starships');
-export const loadStarshipsSuccess = createAction(
-  '[Starship] Load Starships Success',
-  props<{ starships: any[] }>()
-);
-export const loadStarshipsFailure = createAction(
-  '[Starship] Load Starships Failure',
-  props<{ error: any }>()
-);
 
 export const loadStarshipDetails = createAction(
   '[Starship] Load Starship Details',
@@ -23,8 +14,23 @@ export const loadStarshipDetailsFailure = createAction(
   props<{ error: any }>()
 );
 
-
 export const clearSelectedStarship = createAction(
     '[Starship] Clear Selected Starship',
   );
+
+
+export const searchStarships = createAction(
+  '[Starship] Search Starships',
+  props<{ search: string }>()
+);
+
+export const searchStarshipsSuccess = createAction(
+  '[Starship] Search Starships Success',
+  props<{ starships: any[] }>()
+);
+
+export const searchStarshipsFailure = createAction(
+  '[Starship] Search Starships Failure',
+  props<{ error: any }>()
+);
   
