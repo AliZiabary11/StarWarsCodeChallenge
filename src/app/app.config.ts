@@ -8,10 +8,11 @@ import { metaReducers } from './store/meta-reducers/meta-reducers';
 import { StarshipEffects } from './store/effects/starship.effects';
 import { starshipReducer } from './store/reducers/starship.reducer';
 import { HttpClientModule } from '@angular/common/http';
+import { provideAnimationsAsync } from '@angular/platform-browser/animations/async';
 
 export const appConfig: ApplicationConfig = {
   providers: [    provideRouter(routes),
     importProvidersFrom(HttpClientModule),
     provideStore({ starship: starshipReducer }, { metaReducers }),
-    provideEffects([StarshipEffects]),]
+    provideEffects([StarshipEffects]), provideAnimationsAsync(),]
 };
